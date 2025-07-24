@@ -1,0 +1,46 @@
+Install utils:
+# bashrc
+
+alias ssh="ssh -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa"
+alias ussh="ssh -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+alias scp-rsa="scp -o HostKeyAlgorithms=ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa"
+alias uscp-rsa="scp -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o HostKeyAlgorithms=ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa"
+alias ssh-dss="ssh -o HostKeyAlgorithms=ssh-dss -o KexAlgorithms=diffie-hellman-group14-sha1"
+
+alias ping6eth="ping6 ff02::1%enp3s0"
+alias ping6wlan="ping6 ff02::1%wlo1"
+
+alias uscp-dss="scp -o HostKeyAlgorithms=ssh-dss -o KexAlgorithms=diffie-hellman-group1-sha1 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+alias ussh-dss="ssh -o HostKeyAlgorithms=ssh-dss -o KexAlgorithms=diffie-hellman-group1-sha1 -o StrictHostKeyChecking=no -o CheckHostIp=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null"
+
+
+# lime-ssh6
+ || ~ $ cat /usr/local/bin/lime-ssh6 
+#!/bin/bash
+
+iface=$(ip a | grep enp |awk '{print $2}' | awk 'NR==1' | sed 's/:$//');
+        # fixed iface
+        # iface= "enp3s0";
+
+echo "ping6 ff02::1%$iface ..."
+ip=$(ping -i 1 -c 3 ff02::1%$iface | awk '/bytes from/{ print $4 }' | awk 'NR==2' | sed 's/:$//');
+
+echo "Connecting to $ip ..."
+ussh="ssh -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o CheckHostIp=no";
+$ussh root@$ip
+
+# lime-up6
+
+#### lime-up6
+ || ~ $ cat /usr/local/bin/lime-up6 
+        #!/bin/bash
+        # Install the provided sysupgrade file or `./firmware.bin` in the first host found connected via cable
+        ip=$(ping -c 2 ff02::1%enp3s0 | awk '/bytes from/{ print $4 }' | awk 'NR==2' | sed 's/:$//');
+        file= [ ! $1 == "" ] || file="firmware.bin";
+
+        	uscp="scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
+        	ussh="ssh -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o CheckHostIp=no";
+
+        	$uscp ${file} root@\[$ip\]:/tmp && \
+        	$ussh root@$ip "sysupgrade -n -F /tmp/${file}"
+            
