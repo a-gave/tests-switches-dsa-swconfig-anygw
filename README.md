@@ -18,8 +18,8 @@ while true; do sleep 1; clear; date ; bridge fdb | grep aa;  echo ""; done
 3. ? on dsa_device: disable learning on dsa_user ports?802
 4. ? on dsa_device: create mesh protocols 
 5. ? on dsa_device: setup a different dns/dhcp instance for br-dsa?
-6. ? on dsa_device: run mesh protocols on 802.1ad on top of br-dsa or on a 802.1q untagged vlan built on br-dsa  
-
+6. ? on dsa_device: run mesh protocols on 802.1ad on top of br-dsa or on a 802.1q untagged vlan built on br-dsa
+7. ? on dsa_device: block dhcpoffer of anygw coming from swconfig_device
 
 ## Possibly related issues?
 https://github.com/openwrt/openwrt/issues/11650
